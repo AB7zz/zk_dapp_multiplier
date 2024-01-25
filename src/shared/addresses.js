@@ -1,0 +1,3 @@
+export const Addresses = {
+    MULTIPLIER_ADDR: "0x5221db52a4D78BA3F8841dE43aD699aF69315D21"
+}

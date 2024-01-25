@@ -1,0 +1,10 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+
+[rpc_endpoints]
+polygon_mumbai = "https://rpc-mumbai.maticvigil.com/"
+
+[etherscan]
+polygon = { key = "JRM2QF7GHANPP1XPPBAX6IYVZPNRYKKUV6" }
