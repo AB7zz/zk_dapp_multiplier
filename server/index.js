@@ -54,7 +54,6 @@ app.post('/generate_proof', async (req, res) => {
     console.error('Error generating proof:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-
 });
 
 app.listen(port, () => {

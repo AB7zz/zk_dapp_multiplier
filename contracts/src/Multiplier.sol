@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 // Interface to PlonkVerifier.sol
 interface IPlonkVerifier {
-    function verifyProof(bytes memory proof, uint[] memory pubSignals) external view returns (bool);
+    function verifyProof(uint256[24] calldata _proof, uint256[1] calldata _pubSignals) external view returns (bool);
 }
 
 contract SimpleMultiplier {
@@ -16,7 +16,7 @@ contract SimpleMultiplier {
     }
 
     // ZK proof is generated in the browser and submitted as a transaction w/ the proof as bytes.
-    function submitProof(bytes memory proof, uint256[] memory pubSignals) public returns (bool) {
+    function submitProof(uint256[24] calldata proof, uint256[1] calldata pubSignals) public returns (bool) {
         bool result = IPlonkVerifier(s_plonkVerifierAddress).verifyProof(proof, pubSignals);
         emit ProofResult(result);
         return result;

@@ -1,5 +1,9 @@
 import React from 'react'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
+import { custom, http, createPublicClient, createWalletClient } from 'viem'
+import { polygonMumbai } from 'wagmi/chains';
+import { config } from './App'
+import { writeContract } from '@wagmi/core'
 import axios from 'axios';
 import { Stack, Text, Title, Grid, Input, Button, Group, Space } from '@mantine/core'
 import { notifications } from "@mantine/notifications";
@@ -7,13 +11,22 @@ import { ConnectWalletButton } from './components/ConnectWalletButton';
 import { Addresses } from "./shared/addresses"
 import abiPath from "./lib/abi/SimpleMultiplier.json"
 
+const publicClient = createPublicClient({
+    chain: polygonMumbai,
+    transport: http()
+})
+
+export const walletClient = createWalletClient({
+    chain: polygonMumbai,
+    transport: custom(window.ethereum)
+})
 
 const HomePage = () => {
     const [input0, setInput0] = React.useState("");
     const [input1, setInput1] = React.useState("");
-    const { isConnected } = useAccount();
+    const { isConnected, address } = useAccount();
 
-    const { data: hash, writeContract } = useWriteContract()
+    const { connectors } = useConnect();
 
     const handleGenerateProofSendTransaction = async (e) => {
         e.preventDefault()
@@ -23,14 +36,14 @@ const HomePage = () => {
             input1
         }
 
-        const config = {
+        const config2 = {
             headers: {
                 "Content-Type": "application/json"
             }
         }
 
         try{
-            const res = await axios.post('http://localhost:3000/generate_proof', data, config)
+            const res = await axios.post('http://localhost:3000/generate_proof', data, config2)
             notifications.show({
                 message: "Proof generated successfully! Submitting transaction...",
                 color: "green"
@@ -38,21 +51,44 @@ const HomePage = () => {
 
             const { proof, publicSignals } = res.data
 
-            writeContract({
-                address: Addresses.MULTIPLIER_ADDR, 
-                abi: abiPath.abi, 
-                functionName: 'submitProof', 
-                args: [proof, publicSignals] 
+            console.log(proof, publicSignals)
+
+            const { request } = await publicClient.simulateContract({
+                address: Addresses.MULTIPLIER_ADDR,
+                abi: abiPath.abi,
+                functionName: 'submitProof',
+                args: [
+                    proof, 
+                    publicSignals
+                ], 
+                account,
             })
 
-            if(hash){
-                console.log(hash)
-                notifications.show({
-                    message: `Transaction succeeded! Tx Hash: ${hash}`,
-                    color: "green",
-                    autoClose: false,
-                });
-            }
+            const hash = await walletClient.writeContract(request)
+
+            console.log(hash)
+
+            // const result = await writeContract(config, {
+            //     abi: abiPath.abi, 
+            //     address: Addresses.MULTIPLIER_ADDR, 
+            //     functionName: 'submitProof', 
+            //     args: [
+            //         proof, 
+            //         publicSignals
+            //     ],
+            //     account: address,
+            //     chainId: polygonMumbai.id,
+            //     connector: connectors[0]
+            // })
+
+            // console.log(result)
+            
+            // console.log(hash)
+            // notifications.show({
+            //     message: `Transaction succeeded! Tx Hash: ${hash}`,
+            //     color: "green",
+            //     autoClose: false,
+            // })
 
         }catch(err){
             const statusCode = err?.response?.status;

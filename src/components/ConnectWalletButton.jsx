@@ -2,21 +2,20 @@ import React from 'react'
 import { Button } from "@mantine/core"
 import { disconnect } from "@wagmi/core";
 import { useAccount, useConnect, useEnsName } from 'wagmi'
-import { injected } from 'wagmi/connectors'
 
 export const ConnectWalletButton = () => {
     const { address, isConnected } = useAccount();
     const { data } = useEnsName({ address });
-    const { connect } = useConnect({
-        connector: injected(),
-    });
+    const { connectors, connect } = useConnect();
 
 
     const handleClick = () => {
         if (isConnected) {
           disconnect();
         } else {
-          connect();
+          console.log(connectors)
+          const injected = connectors[0].connect()
+          connect({ injected });
         }
     }
 

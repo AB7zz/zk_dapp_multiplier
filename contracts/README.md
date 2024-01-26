@@ -48,7 +48,7 @@ $ anvil
 ### Deploy
 
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ forge script script/Multiplier.s.sol SimpleMultiplierScript --broadcast --verify --etherscan-api-key <your-api-key> --chain polygon --rpc-url polygon_mumbai
 ```
 
 ### Cast

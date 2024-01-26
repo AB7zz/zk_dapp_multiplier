@@ -22,6 +22,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.3",
     "snarkjs": "^0.7.3",
+    "viem": "^2.5.0",
     "wagmi": "^2.5.2"
   },
   "devDependencies": {

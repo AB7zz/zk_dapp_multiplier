@@ -14,13 +14,22 @@ export const generateProof = async (input0, input1) => {
     try{
         const { proof, publicSignals } = await snarkjs.plonk.fullProve(inputs, wasmPath, provingKeyPath);
         const calldataBlob = await snarkjs.plonk.exportSolidityCallData(proof, publicSignals);
-        const calldata = calldataBlob.split(',');
+        let proofString
+        let publicSignalsString
 
-        const proofString = calldata[0].replace(/"/g, '').replace(/\[|\]/g, '');
-        const publicSignalsString = JSON.parse(calldata[1]);
+        const regex = /\[([^[]+)]\[([^[]+)]/;
+        const match = calldataBlob.match(regex);
 
-        console.log('Proof:', proofString)
-        console.log('PublicSignals:', publicSignalsString)
+        if (match) {
+            proofString = match[1];
+            publicSignalsString = match[2];
+
+            proofString = JSON.parse(`[${proofString}]`);
+            publicSignalsString = JSON.parse(`[${publicSignalsString}]`);
+
+            console.log('Proof:', proof);
+            console.log('Public Signals:', publicSignals);
+        }
 
         return {
             proof: proofString, 
